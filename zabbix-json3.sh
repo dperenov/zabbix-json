@@ -114,10 +114,20 @@ for cpuitemid in ${hostids[@]}; do
 done
 echo ${cpunewitemID[@]}
 
+
+for diskid in ${hostids[@]}; do
+	diskitemids=$(curl -s -H 'Content-Type: application/json' -d`
+        `'{"jsonrpc": "2.0","method": "item.get",
+        "params": {"history": 0, "output": "extend", "hostids": "'"$diskid"'","search": {"key_": "last-space"},"sortfield": "name"},
+        "auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[].lastvalue')
+	echo $diskitemids
+done
+
+
 #curl -s -H 'Content-Type: application/json' -d`
-#        `'{"jsonrpc": "2.0","method": "item.get",
-#        "params": {"history": 0, "output": "extend", "hostids": "10303","search": {"key_": "system.cpu.util[,idle]"},"sortfield": "name"},
-#        "auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[]'
+#`'{"jsonrpc": "2.0","method": "item.get",
+#"params": {"history": 0, "output": "extend", "hostids": "10277","search": {"key_": "last-space"},"sortfield": "name"},
+#"auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[]'
 
 
 #cpuhistoryval=()
