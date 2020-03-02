@@ -1,24 +1,50 @@
 #!/bin/bash
 ### Получить groupid ###
-curl -s -X POST -H 'Content-Type: application/json' -d`
-`'{"jsonrpc": "2.0","method": "hostgroup.get",
-"params": {"output": "extend", "filter": { "name": [ "PROD SAP SYSTEMS" ] } },
-"auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[]'
+
+#curl -s -X POST -H 'Content-Type: application/json' -d`
+#`'{"jsonrpc": "2.0","method": "hostgroup.get",
+#"params": {"output": "extend", "filter": { "name": [ "PROD SAP SYSTEMS" ] } },
+#"auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[]'
 ### / Получить groupid ###
 
-### Получить hostid по groupid ###
-hostids=($(curl -s -X POST -H 'Content-Type: application/json' -d`
+## Массив для отчета НАК ##
+nakarray=("sapbackup1.kazatomprom.kz" "saprouter.kazatomprom.kz" "sapbwnodedb1.kazatomprom.kz" "sapbwnodeas1.kazatomprom.kz" "sapprderpdb.kazatomprom.kz" "sapprderpdia3.kazatomprom.kz" "sapprderpas.kazatomprom.kz" "sapprderpdia2.kazatomprom.kz" "sapprderpdia1.kazatomprom.kz" "sapprdgrcdb.kazatomprom.kz" "sapprdgrcas.kazatomprom.kz" "saphcmnodedb1.kazatomprom.kz" "saphcmnodeas1.kazatomprom.kz" "sapprdadsdb.kazatomprom.kz" "sapprdadsas.kazatomprom.kz" "sapppmnodedb1.kazatomprom.kz" "sapppmnodeas1.kazatomprom.kz" "sapprdsmas.kazatomprom.kz" "sapprdsmdb.kazatomprom.kz" "sapbackup2.kazatomprom.kz")
+## / Массив для отчета НАК ##
+
+hostids=()
+for nakid in ${nakarray[@]}; do
+nakarrayids=($(curl -s -X POST -H 'Content-Type: application/json' -d`
 `'{"jsonrpc": "2.0","method": "host.get",
-"params": {"output": ["hostid"], "groupids":"15", "sortfield": "hostid"},
+"params": {"filter": { "host": ["'"$nakid"'"] },"sortfield": "name" },
 "auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[].hostid'))
+hostids+=( $nakarrayids )
+done
 echo ${hostids[@]}
+
+
+for nakname in ${nakarray[@]}; do
+nakarrayname=($(curl -s -X POST -H 'Content-Type: application/json' -d`
+`'{"jsonrpc": "2.0","method": "host.get",
+"params": {"filter": { "host": ["'"$nakname"'"] },"sortfield": "name" },
+"auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[].host'))
+echo $nakarrayname
+done
+
+
+
+### Получить hostid по groupid ###
+#hostids=($(curl -s -X POST -H 'Content-Type: application/json' -d`
+#`'{"jsonrpc": "2.0","method": "host.get",
+#"params": {"output": ["hostid"], "groupids":"15", "sortfield": "hostid"},
+#"auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[].hostid'))
+#echo ${hostids[@]}
 ### /Получить hostid по groupid ###
 
 ### Для теста визуализация ###
-curl -s -X POST -H 'Content-Type: application/json' -d`
-`'{"jsonrpc": "2.0","method": "host.get",
-"params": {"output": ["hostid","host"], "groupids":"15"},
-"auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[].host'
+#curl -s -X POST -H 'Content-Type: application/json' -d`
+#`'{"jsonrpc": "2.0","method": "host.get",
+#"params": {"output": ["hostid","host"], "groupids":"15"},
+#"auth": "e902593e18f6e786031c944c057773f9","id": 1 }' http://172.22.140.240/zabbix/api_jsonrpc.php | jq -r '.result[].host'
 ### /Для теста визуализация ###
 
 ### Получить itemid для каждого хоста(available memory) ###
