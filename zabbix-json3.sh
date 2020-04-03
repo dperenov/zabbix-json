@@ -1,4 +1,5 @@
 #!/bin/bash
+## Author Shahmardan Uraliyev
 ### Получить groupid ###
 
 #curl -s -X POST -H 'Content-Type: application/json' -d`
